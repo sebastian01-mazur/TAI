@@ -3,10 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 function EventDetails() {
-    const { id } = useParams(); // Pobiera ID z paska adresu URL
+    const { id } = useParams();
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [actionMessage, setActionMessage] = useState(''); // Do wyświetlania komunikatu po kliknięciu
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -21,6 +22,29 @@ function EventDetails() {
         };
         fetchEvent();
     }, [id]);
+
+    // Funkcja zapisująca na wydarzenie
+    const handleRegister = async () => {
+        try {
+            const token = localStorage.getItem('token'); // Pobieramy token z pamięci
+
+            if (!token) {
+                setActionMessage('Musisz być zalogowany, aby się zapisać.');
+                return;
+            }
+
+            // Wysyłamy POST, podając token w nagłówku
+            const response = await axios.post(
+                `http://localhost:5000/api/events/${id}/register`,
+                {}, // Puste body
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setActionMessage(response.data.message); // Sukces!
+        } catch (err) {
+            setActionMessage(err.response?.data?.message || 'Wystąpił błąd podczas zapisów.');
+        }
+    };
 
     if (loading) return <p style={{ textAlign: 'center', marginTop: '50px' }}>Ładowanie...</p>;
     if (error) return <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>;
@@ -38,9 +62,18 @@ function EventDetails() {
             <p><strong>Opis:</strong> {event.description}</p>
             <p><strong>Ilość miejsc:</strong> {event.capacity}</p>
 
-            <button style={{ width: '100%', padding: '12px', marginTop: '20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', fontSize: '16px', cursor: 'pointer' }}>
-                Zapisz się (wkrótce)
+            <button
+                onClick={handleRegister}
+                style={{ width: '100%', padding: '12px', marginTop: '20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', fontSize: '16px', cursor: 'pointer' }}>
+                Zapisz się na wydarzenie
             </button>
+
+            {/* Wyświetlanie komunikatu po kliknięciu */}
+            {actionMessage && (
+                <p style={{ marginTop: '15px', fontWeight: 'bold', color: actionMessage.includes('Udało') ? 'green' : 'red' }}>
+                    {actionMessage}
+                </p>
+            )}
         </div>
     );
 }

@@ -28,8 +28,14 @@ app.get('/api/test-db', async (req, res) => {
         res.status(500).send('Błąd połączenia z bazą');
     }
 });
+const organizerDashboardRoutes = require('./routes/organizerDashboard');
+app.use('/api/organizer', organizerDashboardRoutes);
 
 // Uruchomienie nasłuchiwania serwera
 app.listen(PORT, () => {
     console.log(`Serwer śmiga na porcie ${PORT}`);
 });
+const organizerRoutes = require('./routes/organizer');
+app.use('/api/organizer-requests', organizerRoutes);
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);

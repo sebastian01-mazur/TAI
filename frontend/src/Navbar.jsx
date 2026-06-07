@@ -13,7 +13,6 @@ function Navbar() {
         localStorage.removeItem('user');
         navigate('/login'); // Przekierowanie na ekran logowania
     };
-
     return (
         <nav style={{
             display: 'flex',
@@ -32,10 +31,28 @@ function Navbar() {
                 {user ? (
                     // Widok dla zalogowanego użytkownika
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+
+                        {/* Dodajemy link do formularza zgłoszeniowego */}
+                        {/* Logika wyświetlania linków na podstawie roli */}
+                        {user.role === 'USER' && (
+                            <Link to="/become-organizer" style={{ color: '#f39c12', textDecoration: 'none', fontWeight: 'bold', marginRight: '10px' }}>
+                                Zostań organizatorem
+                            </Link>
+                        )}
+
+                        {user.role === 'ORGANIZER' && (
+                            <Link to="/organizer" style={{ color: '#2ecc71', textDecoration: 'none', fontWeight: 'bold', marginRight: '15px' }}>
+                                Panel Organizatora
+                            </Link>
+                        )}
+                        {user.role === 'ADMIN' && (
+                            <Link to="/admin/organizer-requests" style={{ color: '#e74c3c', textDecoration: 'none', fontWeight: 'bold', marginRight: '15px' }}>
+                                Panel Admina
+                            </Link>
+                        )}
+
                         <span>Cześć, {user.first_name}!</span>
-                        <button
-                            onClick={handleLogout}
-                            style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold' }}>
+                        <button onClick={handleLogout} /* reszta guzika bez zmian */ >
                             Wyloguj
                         </button>
                     </div>
