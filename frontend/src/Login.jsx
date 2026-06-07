@@ -42,7 +42,7 @@ function Login() {
             </form>
             {message && <p style={{ marginTop: '15px', color: 'blue' }}>{message}</p>}
 
-            {/* Link do rejestracji [cite: 93] */}
+            {/* Link do rejestracji */}
             <p style={{ marginTop: '20px' }}>
                 Nie masz konta? <Link to="/register">Zarejestruj się</Link>
             </p>

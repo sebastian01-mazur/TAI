@@ -1,0 +1,87 @@
+========================================================================
+             STRUKTURA I DOKUMENTACJA PROJEKTU: EVENT MANAGER
+========================================================================
+
+Projekt jest zaliczeniem przedmiotu i składa się z części backendowej 
+(Node.js + Express + PostgreSQL) oraz frontendowej (React + Vite + Leaflet).
+
+Poniżej znajduje się krótki opis, co znajduje się w każdym z plików:
+
+------------------------------------------------------------------------
+Katalog Główny (Root):
+------------------------------------------------------------------------
+* struktura_projektu.txt - Ten plik. Krótki opis architektury i plików.
+
+------------------------------------------------------------------------
+BACKEND (Katalog: /backend)
+------------------------------------------------------------------------
+Główny serwer i komunikacja z bazą danych PostgreSQL.
+
+* server.js         - Główny plik serwera. Konfiguruje Express, CORS, 
+                      rejestruje wszystkie ścieżki (routing) i odpala serwer 
+                      na porcie 5000. Służy też do serwowania zdjęć z dysku.
+* db.js             - Konfiguracja połączenia (Pool) z bazą PostgreSQL 
+                      przy użyciu zmiennych z pliku .env.
+* .env              - Plik ze zmiennymi środowiskowymi (dane logowania do bazy, 
+                      port serwera i tajny klucz JWT).
+
+/backend/middleware:
+* auth.js           - Sprawdza czy użytkownik przesłał ważny token JWT 
+                      w nagłówku Authorization. Jeśli tak, to wpuszcza 
+                      go dalej i dopisuje dane użytkownika do req.user.
+
+/backend/routes:
+* auth.js           - Obsługa rejestracji (haszowanie hasła bcryptem) 
+                      oraz logowania (weryfikacja hasła i generowanie tokenu JWT).
+* users.js          - Pobieranie danych zalogowanego użytkownika (/me) 
+                      oraz ich edycja (zmiana imienia/nazwiska/hasła).
+* events.js         - Trasy do pobierania listy wydarzeń, pojedynczego eventu, 
+                      szczegółów lokalizacji na mapie, zapisywania/wypisywania się 
+                      oraz dodawania do obserwowanych (serduszka).
+* organizerDashboard.js - Statystyki i dane dla panelu organizatora 
+                      (liczba eventów, suma zapisów/obserwacji, średnie obłożenie 
+                      oraz algorytm popularności).
+* organizer.js      - Trasa dla użytkownika USER do wysyłania wniosku 
+                      o zostanie organizatorem.
+* admin.js          - Trasa dla administratora (ADMIN) do akceptowania/odrzucania 
+                      wniosków o rolę organizatora.
+* upload.js         - Obsługa wgrywania plików graficznych z dysku (Multer) 
+                      i zapisywanie ich w katalogu /uploads.
+
+------------------------------------------------------------------------
+FRONTEND (Katalog: /frontend)
+------------------------------------------------------------------------
+Aplikacja kliencka napisana w React.js przy użyciu Vite.
+
+* main.jsx          - Plik wejściowy Reacta, renderuje główny komponent App.
+* App.jsx           - Konfiguruje router (react-router-dom) i zabezpiecza 
+                      trasy za pomocą roli (klasa ProtectedRoute).
+* App.css           - Globalne, bazowe style dla aplikacji.
+* index.css         - Nasz główny arkusz stylów. Odpowiada za nowoczesny, 
+                      ciemny motyw (dark mode), efekty szklanych kart 
+                      (glassmorphism), neonowe gradienty i mikro-animacje hover.
+
+/frontend/src (Komponenty i Strony):
+* Navbar.jsx        - Pasek nawigacyjny na górze strony. Dynamicznie pokazuje linki 
+                      w zależności od roli użytkownika. Zawiera dzwoneczek 
+                      powiadomień z dropdownem i pollingiem co 15 sekund.
+* Login.jsx / Register.jsx - Formularze do logowania i zakładania konta.
+* Events.jsx        - Główna strona wydarzeń. Posiada wyszukiwarkę tekstową, 
+                      wybór daty, filtry wielokrotnego wyboru kategorii (checkboxy), 
+                      dodawanie do obserwowanych (serduszko) oraz podgląd grafiki.
+* EventDetails.jsx  - Szczegółowy podgląd wydarzenia z listą uczestników, 
+                      interaktywną mapą Leaflet i przyciskiem zapisu/obserwacji.
+* Profile.jsx       - Strona profilowa użytkownika. Można tu zmienić imię, 
+                      nazwisko oraz hasło.
+* BecomeOrganizer.jsx - Formularz wysłania wniosku o nadanie uprawnień organizatora.
+* OrganizerDashboard.jsx - Panel statystyk organizatora z kartami wskaźników, 
+                      wykresami (obłożenia oraz punktów popularności) 
+                      oraz listą własnych wydarzeń (edycja/anulowanie).
+* CreateEvent.jsx / EditEvent.jsx - Formularze do tworzenia i edycji wydarzeń. 
+                      Obsługują pinezkę na mapie Leaflet oraz wysyłanie pliku 
+                      zdjęcia z komputera na serwer.
+* MapView.jsx       - Widok pełnoekranowej mapy z zaznaczonymi wszystkimi 
+                      aktywnymi wydarzeniami.
+* AdminDashboard.jsx - Panel administracyjny do rozpatrywania wniosków 
+                      o nadanie uprawnień organizatora.
+========================================================================

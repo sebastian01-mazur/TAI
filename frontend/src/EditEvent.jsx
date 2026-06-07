@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -16,7 +16,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-// Helper component to handle click events on Leaflet Map
 function LocationMarker({ position, onClick }) {
   useMapEvents({
     click(e) {
@@ -29,12 +28,13 @@ function LocationMarker({ position, onClick }) {
   );
 }
 
-function CreateEvent() {
+function EditEvent() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'Rozrywka', // Domyślna kategoria
+    category: 'Rozrywka',
     event_date: '',
     start_time: '',
     end_time: '',
@@ -48,6 +48,7 @@ function CreateEvent() {
   const [mapPosition, setMapPosition] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
@@ -78,6 +79,60 @@ function CreateEvent() {
     }
   };
 
+  // Fetch logged in user to check ownership
+  const userString = localStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : null;
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchEventData = async () => {
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      try {
+        const response = await axios.get(`http://localhost:5000/api/events/${id}`);
+        const event = response.data;
+
+        // Check ownership
+        if (event.organizer_id !== user.id && user.role !== 'ADMIN') {
+          alert('Brak uprawnień do edycji tego wydarzenia.');
+          navigate('/organizer');
+          return;
+        }
+
+        // Format event date YYYY-MM-DD
+        const formattedDate = new Date(event.event_date).toISOString().split('T')[0];
+
+        setFormData({
+          title: event.title,
+          description: event.description,
+          category: event.category,
+          event_date: formattedDate,
+          start_time: event.start_time || '',
+          end_time: event.end_time || '',
+          location_name: event.location_name,
+          capacity: event.capacity,
+          latitude: event.latitude || '',
+          longitude: event.longitude || '',
+          image_url: event.image_url || ''
+        });
+
+        if (event.latitude && event.longitude) {
+          const latlng = { lat: parseFloat(event.latitude), lng: parseFloat(event.longitude) };
+          setMapPosition(latlng);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        setError('Błąd podczas pobierania danych wydarzenia.');
+        setLoading(false);
+      }
+    };
+
+    fetchEventData();
+  }, [id, token, navigate]);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -97,38 +152,34 @@ function CreateEvent() {
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('Brak autoryzacji. Zaloguj się ponownie.');
-        return;
-      }
-
-      await axios.post(
-        'http://localhost:5000/api/events',
+      await axios.put(
+        `http://localhost:5000/api/events/${id}`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setMessage('Wydarzenie utworzone! Przekierowuję do panelu...');
+      setMessage('Wydarzenie zaktualizowane! Powiadamianie zapisanych uczestników...');
 
       setTimeout(() => {
-        navigate('/organizer'); // Powrót do panelu organizatora
+        navigate('/organizer');
       }, 1500);
 
     } catch (err) {
-      setError(err.response?.data?.message || 'Błąd podczas tworzenia wydarzenia.');
+      setError(err.response?.data?.message || 'Błąd podczas aktualizacji wydarzenia.');
     }
   };
 
-  // Default center: Poland (Warsaw: 52.2297, 21.0122)
-  const defaultCenter = [52.2297, 21.0122];
+  const defaultCenter = mapPosition ? [mapPosition.lat, mapPosition.lng] : [52.2297, 21.0122];
+
+  if (loading) return <div className="container" style={{ textAlign: 'center' }}><p>Wczytywanie wydarzenia...</p></div>;
+  if (error) return <div className="container" style={{ textAlign: 'center', color: 'var(--danger-color)' }}><p>{error}</p></div>;
 
   return (
     <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
       <div className="glass-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>Nowe Wydarzenie</h2>
-          <Link to="/organizer" className="btn btn-secondary" style={{ padding: '8px 16px' }}>&larr; Anuluj</Link>
+          <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>Edytuj Wydarzenie</h2>
+          <Link to="/organizer" className="btn btn-secondary" style={{ padding: '8px 16px' }}>&larr; Wróć</Link>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -140,7 +191,6 @@ function CreateEvent() {
                 <input 
                   type="text" 
                   name="title" 
-                  placeholder="np. Koncert Rockowy" 
                   value={formData.title} 
                   onChange={handleChange} 
                   required 
@@ -163,7 +213,6 @@ function CreateEvent() {
                 <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: 'var(--text-secondary)' }}>Opis wydarzenia</label>
                 <textarea 
                   name="description" 
-                  placeholder="Napisz coś więcej o wydarzeniu..." 
                   value={formData.description} 
                   onChange={handleChange} 
                   required 
@@ -187,7 +236,6 @@ function CreateEvent() {
                 <input 
                   type="text" 
                   name="location_name" 
-                  placeholder="np. Klub Proxima, Warszawa" 
                   value={formData.location_name} 
                   onChange={handleChange} 
                   required 
@@ -199,7 +247,6 @@ function CreateEvent() {
                 <input 
                   type="number" 
                   name="capacity" 
-                  placeholder="np. 150" 
                   value={formData.capacity} 
                   onChange={handleChange} 
                   min="1" 
@@ -256,7 +303,7 @@ function CreateEvent() {
           {/* Coordinate Map Selection */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontSize: '15px', fontWeight: '500', color: 'var(--text-primary)' }}>
-              Wybierz lokalizację na mapie (kliknij na mapie, aby postawić pinezkę)
+              Wybierz lokalizację na mapie (kliknij na mapie, aby zaktualizować pinezkę)
             </label>
             <div style={{ display: 'flex', gap: '15px', marginBottom: '12px' }}>
               <div style={{ flex: 1 }}>
@@ -266,7 +313,6 @@ function CreateEvent() {
                   name="latitude" 
                   value={formData.latitude} 
                   readOnly 
-                  placeholder="Kliknij na mapie" 
                   style={{ display: 'inline-block', width: 'auto', padding: '6px 12px', fontSize: '13px' }} 
                 />
               </div>
@@ -277,7 +323,6 @@ function CreateEvent() {
                   name="longitude" 
                   value={formData.longitude} 
                   readOnly 
-                  placeholder="Kliknij na mapie" 
                   style={{ display: 'inline-block', width: 'auto', padding: '6px 12px', fontSize: '13px' }} 
                 />
               </div>
@@ -286,7 +331,7 @@ function CreateEvent() {
             <div className="map-container" style={{ height: '300px' }}>
               <MapContainer 
                 center={defaultCenter} 
-                zoom={6} 
+                zoom={10} 
                 style={{ height: '100%', width: '100%' }}
               >
                 <TileLayer
@@ -298,8 +343,8 @@ function CreateEvent() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-success" style={{ width: '100%', padding: '14px', fontSize: '16px', marginTop: '10px' }}>
-            Zapisz wydarzenie
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '16px', marginTop: '10px' }}>
+            Zaktualizuj wydarzenie
           </button>
         </form>
 
@@ -310,4 +355,4 @@ function CreateEvent() {
   );
 }
 
-export default CreateEvent;
+export default EditEvent;

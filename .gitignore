@@ -1,0 +1,34 @@
+# Zależności npm
+node_modules/
+package-lock.json
+
+# Środowisko i konfiguracje lokalne
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Folder z wgranymi plikami (lokalne uploads)
+backend/uploads/
+
+# Buildy produkcyjne frontendu
+frontend/dist/
+
+# Pliki logów i tymczasowe
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+*.log
+
+# Pliki edytora i systemu
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+Thumbs.db
+.DS_Store
