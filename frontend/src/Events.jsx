@@ -8,12 +8,12 @@ function Events() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // States for search and filtering
+  // Zmienne stanu wyszukiwania i filtrowania
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]); // Array for multiple selection
   const [selectedDate, setSelectedDate] = useState('');
 
-  // Fetch logged-in user to show action buttons
+  // Odczyt danych sesji (użytkownik, token)
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
   const token = localStorage.getItem('token');
@@ -35,11 +35,11 @@ function Events() {
     fetchEvents();
   }, [token]);
 
-  // Handle client-side search and filtering
+  // Logika filtrowania po stronie klienta
   useEffect(() => {
     let result = events;
 
-    // Filter by text search (title, location, or description)
+    // Filtrowanie tekstowe (tytuł, lokalizacja, opis)
     if (searchQuery.trim() !== '') {
       result = result.filter(event => 
         event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -48,12 +48,12 @@ function Events() {
       );
     }
 
-    // Filter by multiple categories
+    // Filtrowanie po wielu kategoriach
     if (selectedCategories.length > 0) {
       result = result.filter(event => selectedCategories.includes(event.category));
     }
 
-    // Filter by date
+    // Filtrowanie po wybranej dacie
     if (selectedDate !== '') {
       result = result.filter(event => {
         const eventDateStr = new Date(event.event_date).toISOString().split('T')[0];
@@ -99,7 +99,7 @@ function Events() {
   if (loading) return <div className="container" style={{ textAlign: 'center' }}><p>Ładowanie wydarzeń...</p></div>;
   if (error) return <div className="container" style={{ textAlign: 'center', color: 'var(--danger-color)' }}><p>{error}</p></div>;
 
-  // Category badge styles
+  // Mapowanie kategorii na klasy CSS (kolory etykiet)
   const getCategoryClass = (cat) => {
     const categoriesMap = {
       'Rozrywka': 'badge-entertainment',
@@ -112,7 +112,7 @@ function Events() {
     return categoriesMap[cat] || 'badge-other';
   };
 
-  // Get color for progress bar
+  // Ustalanie koloru paska postępu zależnie od wypełnienia
   const getProgressBarClass = (percent) => {
     if (percent >= 90) return 'progress-red';
     if (percent >= 60) return 'progress-orange';
@@ -124,26 +124,25 @@ function Events() {
   return (
     <div className="container">
       {/* Header section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '15px' }}>
-        <div style={{ textAlign: 'left' }}>
-          <h2 style={{ fontSize: '28px', color: 'var(--text-primary)', marginBottom: '4px' }}>Nadchodzące Wydarzenia</h2>
-          <p style={{ color: 'var(--text-secondary)' }}>Zapisz się na najciekawsze wydarzenia lub obserwuj je za pomocą serduszka.</p>
-        </div>
-        
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <Link to="/events/map" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center' }}>
-            🗺️ Zobacz na mapie
-          </Link>
-          {(user?.role === 'ORGANIZER' || user?.role === 'ADMIN') && (
-            <Link to="/organizer/events/new" className="btn btn-primary">
-              ➕ Utwórz wydarzenie
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '15px' }}>
+          <div style={{ textAlign: 'left' }}>
+            <h2 style={{ fontSize: '28px', color: 'var(--text-primary)', marginBottom: '4px' }}>Nadchodzące Wydarzenia</h2>
+            <p style={{ color: 'var(--text-secondary)' }}>Zapisz się na najciekawsze wydarzenia lub obserwuj je za pomocą serduszka.</p>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Link to="/events/map" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center' }}>
+              🗺️ Zobacz na mapie
             </Link>
-          )}
+            {(user?.role === 'ORGANIZER' || user?.role === 'ADMIN') && (
+              <Link to="/organizer/events/new" className="btn btn-primary">
+                ➕ Utwórz wydarzenie
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
-
       {/* Search and Filters panel */}
-      <div className="glass-card" style={{ marginBottom: '32px', display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
+        <div className="glass-card" style={{ marginBottom: '32px', display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
         
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', width: '100%' }}>
           {/* Search bar */}
@@ -182,7 +181,7 @@ function Events() {
                   alignItems: 'center', 
                   gap: '8px', 
                   cursor: 'pointer',
-                  backgroundColor: selectedCategories.includes(cat) ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255,255,255,0.03)',
+                  backgroundColor: selectedCategories.includes(cat) ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.03)',
                   padding: '6px 12px',
                   borderRadius: '20px',
                   border: '1px solid',
@@ -218,8 +217,7 @@ function Events() {
             Wyczyść filtry
           </button>
         )}
-      </div>
-
+        </div>
       {/* Events Grid */}
       {filteredEvents.length === 0 ? (
         <div className="glass-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
@@ -227,7 +225,7 @@ function Events() {
         </div>
       ) : (
         <div className="grid-3">
-          {filteredEvents.map((event) => {
+          {filteredEvents.map((event, index) => {
             const capacity = event.capacity || 1;
             const participantCount = event.participant_count || 0;
             const filledPercent = Math.min(Math.round((participantCount / capacity) * 100), 100);
@@ -235,7 +233,7 @@ function Events() {
 
             return (
               <div 
-                key={event.id} 
+                key={event.id}
                 className="glass-card" 
                 style={{ 
                   display: 'flex', 
@@ -258,7 +256,7 @@ function Events() {
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                     />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', background: 'linear-gradient(135deg, #051817 0%, #0b2f2c 100%)' }}>
                       ⚡
                     </div>
                   )}

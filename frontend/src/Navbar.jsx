@@ -71,9 +71,9 @@ function Navbar() {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '16px 40px',
-            backgroundColor: 'rgba(22, 30, 47, 0.8)',
+            backgroundColor: 'rgba(10, 17, 30, 0.8)',
             backdropFilter: 'blur(12px)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            borderBottom: '1px solid var(--border-color)',
             position: 'sticky',
             top: 0,
             zIndex: 1000,
@@ -184,12 +184,12 @@ function Navbar() {
                                                     onClick={() => !notif.is_read && handleMarkSingleRead(notif.id)}
                                                     style={{ 
                                                         padding: '10px', 
-                                                        borderRadius: '6px', 
-                                                        backgroundColor: notif.is_read ? 'rgba(255,255,255,0.02)' : 'rgba(99, 102, 241, 0.08)', 
+                                                        borderRadius: '8px', 
+                                                        backgroundColor: notif.is_read ? 'rgba(255,255,255,0.02)' : 'rgba(16, 185, 129, 0.08)', 
                                                         border: '1px solid',
-                                                        borderColor: notif.is_read ? 'transparent' : 'rgba(99, 102, 241, 0.2)',
+                                                        borderColor: notif.is_read ? 'transparent' : 'rgba(16, 185, 129, 0.2)',
                                                         cursor: notif.is_read ? 'default' : 'pointer',
-                                                        transition: 'background-color 0.2s'
+                                                        transition: 'all 0.2s ease'
                                                     }}
                                                 >
                                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>

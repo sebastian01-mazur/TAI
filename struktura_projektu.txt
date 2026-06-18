@@ -48,6 +48,10 @@ Główny serwer i komunikacja z bazą danych PostgreSQL.
 * upload.js         - Obsługa wgrywania plików graficznych z dysku (Multer) 
                       i zapisywanie ich w katalogu /uploads.
 
+/backend/scripts:
+* checkUser.js      - Skrypt pomocniczy do bezpośredniej weryfikacji danych użytkownika w bazie.
+* resetPassword.js  - Skrypt narzędziowy do ręcznego resetowania hasła wybranego użytkownika.
+
 ------------------------------------------------------------------------
 FRONTEND (Katalog: /frontend)
 ------------------------------------------------------------------------
@@ -59,7 +63,7 @@ Aplikacja kliencka napisana w React.js przy użyciu Vite.
 * App.css           - Globalne, bazowe style dla aplikacji.
 * index.css         - Nasz główny arkusz stylów. Odpowiada za nowoczesny, 
                       ciemny motyw (dark mode), efekty szklanych kart 
-                      (glassmorphism), neonowe gradienty i mikro-animacje hover.
+                      (glassmorphism) i podstawowe style aplikacji. Kod zoptymalizowany.
 
 /frontend/src (Komponenty i Strony):
 * Navbar.jsx        - Pasek nawigacyjny na górze strony. Dynamicznie pokazuje linki 

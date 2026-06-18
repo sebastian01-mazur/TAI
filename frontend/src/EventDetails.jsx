@@ -4,7 +4,8 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-// Import marker images directly to fix Vite bundling issues
+
+// Ręczny import grafik markerów (obejście błędu bundlowania w Vite)
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -25,7 +26,7 @@ function EventDetails() {
   const [actionMessage, setActionMessage] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
 
-  // Fetch logged in user info
+  // Pobranie danych zalogowanego użytkownika (z localStorage)
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
   const token = localStorage.getItem('token');
@@ -44,7 +45,7 @@ function EventDetails() {
       const partsList = participantsResponse.data;
       setParticipants(partsList);
 
-      // Check if current user is in participants list
+      // Weryfikacja, czy obecny użytkownik znajduje się na liście uczestników
       if (user) {
         const registered = partsList.some(p => p.email === user.email);
         setIsRegistered(registered);
@@ -126,7 +127,7 @@ function EventDetails() {
   const lng = parseFloat(event.longitude);
   const hasCoordinates = !isNaN(lat) && !isNaN(lng);
 
-  // Calculate percentage of filled seats
+  // Obliczenia statystyk obłożenia miejsc na wydarzeniu
   const capacity = event.capacity || 1;
   const participantCount = event.participant_count || 0;
   const filledPercent = Math.min(Math.round((participantCount / capacity) * 100), 100);
@@ -173,7 +174,7 @@ function EventDetails() {
             style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           />
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg, #051817 0%, #0b2f2c 100%)' }}>
             ⚡
           </div>
         )}
@@ -199,11 +200,10 @@ function EventDetails() {
             ANULOWANE PRZEZ ORGANIZATORA
           </div>
         )}
-      </div>
-
+        </div>
       <div className="grid-2">
         {/* Left Side: Info */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
               <span className={`badge ${getCategoryClass(event.category)}`}>
@@ -299,8 +299,7 @@ function EventDetails() {
               {actionMessage}
             </p>
           )}
-        </div>
-
+          </div>
         {/* Right Side: Map & Participants */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Map card */}

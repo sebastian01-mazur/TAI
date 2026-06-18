@@ -76,7 +76,7 @@ function OrganizerDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px', marginBottom: '32px' }}>
           {/* Card 1: Total Events */}
           <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px' }}>
-            <div style={{ fontSize: '30px', backgroundColor: 'rgba(99, 102, 241, 0.15)', width: '54px', height: '54px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-color)' }}>
+            <div style={{ fontSize: '30px', backgroundColor: 'rgba(16, 185, 129, 0.15)', width: '54px', height: '54px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-color)' }}>
               📅
             </div>
             <div style={{ textAlign: 'left' }}>
@@ -210,7 +210,7 @@ function OrganizerDashboard() {
                             width: `${chartMode === 'occupancy' ? percentCap : percentWidth}%`, 
                             background: chartMode === 'occupancy' 
                               ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)' 
-                              : 'linear-gradient(90deg, var(--accent-color) 0%, #a855f7 100%)',
+                              : 'linear-gradient(90deg, var(--accent-color) 0%, #06b6d4 100%)',
                             borderRadius: '6px',
                             transition: 'width 0.5s ease'
                           }} 
